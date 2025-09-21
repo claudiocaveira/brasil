@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
-import { Camera, Upload, X, Eye, Star, Sparkles, LogIn } from 'lucide-react';
+import { Camera, Upload, X, Sparkles, LogIn, Star } from 'lucide-react';
 
-// Tipos básicos
 interface User {
   id: string;
   name: string;
@@ -25,7 +24,6 @@ interface AnalysisResult {
   };
 }
 
-// Dados mock
 const mockUser: User = {
   id: '1',
   name: 'Maria Silva',
@@ -373,6 +371,27 @@ function App() {
                     <p className="text-xs text-gray-500 text-center">
                       Faltam {500 - (user.points % 500)} pontos para o próximo nível
                     </p>
+                  </div>
+
+                  <div className="bg-gradient-to-r from-purple-50 to-pink-50 rounded-xl p-6 border border-purple-100">
+                    <div className="flex items-center space-x-3 mb-3">
+                      <Star className="w-6 h-6 text-purple-600" />
+                      <h4 className="font-semibold text-gray-900">Próximas Metas</h4>
+                    </div>
+                    <div className="space-y-2 text-sm text-gray-600">
+                      <div className="flex items-center justify-between">
+                        <span>• Realizar 5 análises</span>
+                        <span className="text-purple-600 font-medium">+100 pts</span>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span>• Compartilhar resultado</span>
+                        <span className="text-purple-600 font-medium">+50 pts</span>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span>• Usar app por 7 dias</span>
+                        <span className="text-purple-600 font-medium">+200 pts</span>
+                      </div>
+                    </div>
                   </div>
                 </div>
               )}
