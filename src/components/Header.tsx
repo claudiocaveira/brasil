@@ -9,3 +9,5 @@
    onLoginClick: () => void;
    onProfileClick: () => void;
  }
+
+export default React
