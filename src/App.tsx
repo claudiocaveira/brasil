@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Camera, Upload, X, Sparkles, User, Star, Download, RefreshCw, Eye, Share2 } from 'lucide-react';
+import { Camera, Upload, Sparkles, User, Star, RefreshCw, Eye, Share2 } from 'lucide-react';
 
 function App() {
   const [photos, setPhotos] = useState<{[key: string]: File}>({});
@@ -11,6 +11,31 @@ function App() {
     { key: 'right', label: 'Lado Direito', icon: '👉', description: 'Perfil direito' },
     { key: 'hair', label: 'Foto do Cabelo', icon: '💇‍♀️', description: 'Foco no cabelo' }
   ];
+
+  const handleFileUpload = (type: string, file: File) => {
+    setPhotos(prev => ({ ...prev, [type]: file }));
+    
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      setPreviews(prev => ({ ...prev, [type]: e.target?.result as string }));
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const removePhoto = (type: string) => {
+    setPhotos(prev => {
+      const newPhotos = { ...prev };
+      delete newPhotos[type];
+      return newPhotos;
+    });
+    setPreviews(prev => {
+      const newPreviews = { ...prev };
+      delete newPreviews[type];
+      return newPreviews;
+    });
+  };
+
+  const isComplete = Object.keys(photos).length === 4;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50">
@@ -78,27 +103,68 @@ function App() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-10">
                   {uploadAreas.map((area) => (
                     <div key={area.key} className="relative">
-                      <div className="block w-full h-48 border-2 border-dashed border-gray-300 rounded-2xl hover:border-purple-400 transition-colors cursor-pointer group">
-                        <div className="flex flex-col items-center justify-center h-full text-gray-500 group-hover:text-purple-600 transition-colors">
-                          <div className="text-4xl mb-3">{area.icon}</div>
-                          <Upload className="w-6 h-6 mb-3" />
-                          <span className="font-semibold text-lg">{area.label}</span>
-                          <span className="text-sm text-gray-400 mt-1">{area.description}</span>
+                      <input
+                        type="file"
+                        id={area.key}
+                        accept="image/*"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) {
+                            handleFileUpload(area.key, file);
+                          }
+                        }}
+                        className="hidden"
+                      />
+                      
+                      {previews[area.key] ? (
+                        <div className="relative group">
+                          <img
+                            src={previews[area.key]}
+                            alt={area.label}
+                            className="w-full h-48 object-cover rounded-2xl border-2 border-green-200"
+                          />
+                          <div className="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity rounded-2xl flex items-center justify-center">
+                            <button
+                              onClick={() => removePhoto(area.key)}
+                              className="p-2 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors"
+                            >
+                              ✕
+                            </button>
+                          </div>
+                          <div className="absolute top-2 left-2 bg-green-500 text-white px-2 py-1 rounded-full text-xs font-medium">
+                            ✓ Enviado
+                          </div>
                         </div>
-                      </div>
+                      ) : (
+                        <label
+                          htmlFor={area.key}
+                          className="block w-full h-48 border-2 border-dashed border-gray-300 rounded-2xl hover:border-purple-400 transition-colors cursor-pointer group"
+                        >
+                          <div className="flex flex-col items-center justify-center h-full text-gray-500 group-hover:text-purple-600 transition-colors">
+                            <div className="text-4xl mb-3">{area.icon}</div>
+                            <Upload className="w-6 h-6 mb-3" />
+                            <span className="font-semibold text-lg">{area.label}</span>
+                            <span className="text-sm text-gray-400 mt-1">{area.description}</span>
+                          </div>
+                        </label>
+                      )}
                     </div>
                   ))}
                 </div>
 
                 <div className="text-center">
                   <button
-                    disabled
-                    className="px-12 py-5 rounded-2xl font-bold text-xl bg-gray-200 text-gray-500 cursor-not-allowed shadow-lg"
+                    disabled={!isComplete}
+                    className={`px-12 py-5 rounded-2xl font-bold text-xl shadow-lg transition-all ${
+                      isComplete
+                        ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white hover:from-purple-700 hover:to-pink-700 cursor-pointer'
+                        : 'bg-gray-200 text-gray-500 cursor-not-allowed'
+                    }`}
                   >
-                    Envie todas as 4 fotos
+                    {isComplete ? '🔍 Analisar Envelhecimento' : 'Envie todas as 4 fotos'}
                   </button>
                   <p className="text-sm text-gray-500 mt-4">
-                    Faça upload das fotos para habilitar a análise
+                    {isComplete ? 'Clique para iniciar a análise' : 'Faça upload das fotos para habilitar a análise'}
                   </p>
                 </div>
               </div>
